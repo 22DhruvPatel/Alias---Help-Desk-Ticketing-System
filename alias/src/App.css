@@ -1,0 +1,96 @@
+/*
+  Alias landing page global styles.
+  These rules define the base reset, typography, and reusable navigation styling
+  used across the marketing/public-facing experience.
+*/
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #172554;
+  background: #ffffff;
+}
+
+a {
+  text-decoration: none;
+}
+
+/*
+  Top navigation layout for the landing page.
+  The navbar stays pinned to the top while viewing the page and provides the
+  key entry points: Home, About, Sign In, and Create Account.
+*/
+.landing-navbar {
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 7%;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Brand/logo */
+.brand img {
+  width: 150px;
+  height: auto;
+  display: block;
+}
+
+/* Navigation links*/
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: #334155;
+  font-size: 15px;
+  font-weight: 500;
+
+  transition: 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #2563eb;
+}
+
+.nav-links .active {
+  color: #2563eb;
+}
+
+.nav-signin {
+  margin-left: 15px;
+}
+
+.nav-register {
+  background: #2563eb;
+  color: white !important;
+
+  padding: 11px 20px;
+
+  border-radius: 8px;
+
+  transition: 0.2s ease;
+}
+
+.nav-register:hover {
+  background: #1d4ed8;
+}
