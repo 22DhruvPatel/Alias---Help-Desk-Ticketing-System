@@ -1,16 +1,45 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import  { supabase } from "../lib/supabaseclient";
 
+/**
+ * Login page for signing in to Alias.
+ */
 function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate();
+
+    // Submit login
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Authentication will be connected to Supabase here.
-        console.log("Login submitted");
-    };
+        setError("");
+        setLoading(true);
+
+        // Sign in credentials
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+
+        // Sign in with Supabase
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        })
+
+        if ( error ) {
+            setError(error.message);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(false);
+
+        navigate("/");
+    }
 
     return (
         <>
@@ -478,6 +507,27 @@ function LoginPage() {
                 }
 
 
+                .form-message {
+                    padding: 12px 14px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    font-size: 13px;
+                    line-height: 1.5;
+                }
+
+                .error-message {
+                    background: #fef2f2;
+                    color: #b91c1c;
+                    border: 1px solid #fecaca;
+                }
+
+                .login-button:disabled {
+                    background: #93c5fd;
+                    cursor: not-allowed;
+                    transform: none;
+                    box-shadow: none;
+                }
+
 
                 @media (max-width: 800px) {
 
@@ -550,10 +600,7 @@ function LoginPage() {
                 <div className="login-container">
 
 
-                    {/* =================================
-                        LEFT INFORMATION PANEL
-                    ================================== */}
-
+                    {/* Account info */}
                     <section className="login-info">
 
                         <div className="login-brand">
@@ -627,6 +674,7 @@ function LoginPage() {
 
                 
 
+                    {/* Login form */}
                     <section className="login-form-section">
 
                         <div className="login-form-header">
@@ -642,13 +690,19 @@ function LoginPage() {
                         </div>
 
 
+                        {error && (
+                            <div className="form-message error-message">
+                                {error}
+                            </div>
+                        )}
+
+                        
                         <form
                             className="login-form"
                             onSubmit={handleSubmit}
                         >
 
-                            {/* EMAIL */}
-
+                            {/* Email field */}
                             <div className="form-group">
 
                                 <label htmlFor="email">
@@ -668,8 +722,7 @@ function LoginPage() {
                             </div>
 
 
-                            {/* PASSWORD */}
-
+                            {/* Password field */}
                             <div className="form-group">
 
                                 <label htmlFor="password">
@@ -709,8 +762,7 @@ function LoginPage() {
                             </div>
 
 
-                            {/* OPTIONS */}
-
+                            {/* Options */}
                             <div className="login-options">
 
                                 <label className="remember-option">
@@ -740,20 +792,19 @@ function LoginPage() {
                             </div>
 
 
-                            {/* SUBMIT */}
-
+                            {/* Submit form */}
                             <button
                                 type="submit"
                                 className="login-button"
+                                disabled={loading}
                             >
-                                Sign In
+                                {loading ? "Signing In..." : "Sign In"}
                             </button>
 
                         </form>
 
 
-                        {/* REGISTER */}
-
+                        {/* Register link */}
                         <div className="register-section">
 
                             Don't have an account?
@@ -768,8 +819,7 @@ function LoginPage() {
                         </div>
 
 
-                        {/* HOME */}
-
+                        {/* Home link */}
                         <Link
                             to="/"
                             className="back-home"
