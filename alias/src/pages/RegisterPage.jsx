@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabaseclient";
 
-/** Register page */
 function RegisterPage() {
+
+    const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    // Form state
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -15,26 +21,119 @@ function RegisterPage() {
         confirmPassword: ""
     });
 
-    // Input update
+
+    // Update form state
     const handleChange = (e) => {
+
         const { name, value } = e.target;
 
         setFormData({
             ...formData,
             [name]: value
         });
+
+        setError("");
+        setSuccess("");
     };
 
-    // Validate form
-    const handleSubmit = (e) => {
+
+    // Submit registration
+    const handleSubmit = async (e) => {
+
         e.preventDefault();
 
+        setError("");
+        setSuccess("");
+
+
+        // Match passwords
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match.");
+
+            setError("Passwords do not match.");
+
             return;
         }
 
-        console.log("Registration submitted:", formData);
+
+        // Check length
+        if (formData.password.length < 8) {
+
+            setError(
+                "Password must contain at least 8 characters."
+            );
+
+            return;
+        }
+
+
+        setLoading(true);
+
+
+        // Sign up with Supabase
+        const { data, error } = await supabase.auth.signUp({
+
+            email: formData.email,
+
+            password: formData.password,
+
+            options: {
+
+                data: {
+                    full_name: formData.fullName
+                }
+
+            }
+
+        });
+
+
+        // Handle auth error
+        if (error) {
+
+            setError(error.message);
+
+            setLoading(false);
+
+            return;
+        }
+
+
+        // Handle success
+        setLoading(false);
+
+
+        /*
+         * If email confirmation is enabled in Supabase,
+         * a user will be created but there will be no
+         * active session yet.
+         */
+
+        if (data.user && !data.session) {
+
+            setSuccess(
+                "Account created successfully. Please check your email to verify your account."
+            );
+
+            return;
+        }
+
+
+        /*
+         * If email confirmation is disabled,
+         * the user will receive a session immediately.
+         */
+
+        setSuccess(
+            "Account created successfully. Redirecting to Sign In..."
+        );
+
+
+        setTimeout(() => {
+
+            navigate("/login");
+
+        }, 1500);
+
     };
 
 
@@ -314,6 +413,41 @@ function RegisterPage() {
 
 
                 /* =========================================
+                   FORM MESSAGES
+                ========================================= */
+
+                .form-message {
+                    padding: 12px 14px;
+
+                    border-radius: 8px;
+
+                    margin-bottom: 20px;
+
+                    font-size: 13px;
+
+                    line-height: 1.5;
+                }
+
+
+                .error-message {
+                    background: #fef2f2;
+
+                    color: #b91c1c;
+
+                    border: 1px solid #fecaca;
+                }
+
+
+                .success-message {
+                    background: #f0fdf4;
+
+                    color: #15803d;
+
+                    border: 1px solid #bbf7d0;
+                }
+
+
+                /* =========================================
                    FORM
                 ========================================= */
 
@@ -426,7 +560,7 @@ function RegisterPage() {
 
 
                 /* =========================================
-                   PASSWORD REQUIREMENTS
+                   PASSWORD HINT
                 ========================================= */
 
                 .password-hint {
@@ -458,6 +592,8 @@ function RegisterPage() {
                     font-size: 12px;
 
                     line-height: 1.5;
+
+                    cursor: pointer;
                 }
 
 
@@ -536,6 +672,17 @@ function RegisterPage() {
 
                 .register-button:active {
                     transform: translateY(0);
+                }
+
+
+                .register-button:disabled {
+                    background: #93c5fd;
+
+                    cursor: not-allowed;
+
+                    transform: none;
+
+                    box-shadow: none;
                 }
 
 
@@ -762,6 +909,22 @@ function RegisterPage() {
                         </div>
 
 
+                        {/* Error message */}
+                        {error && (
+                            <div className="form-message error-message">
+                                {error}
+                            </div>
+                        )}
+
+
+                        {/* Success message */}
+                        {success && (
+                            <div className="form-message success-message">
+                                {success}
+                            </div>
+                        )}
+
+
                         <form
                             className="register-form"
                             onSubmit={handleSubmit}
@@ -928,18 +1091,23 @@ function RegisterPage() {
                             </label>
 
 
-                            {/* Submit form */}
+                            {/* Register button */}
                             <button
                                 type="submit"
                                 className="register-button"
+                                disabled={loading}
                             >
-                                Create Account
+
+                                {loading
+                                    ? "Creating Account..."
+                                    : "Create Account"}
+
                             </button>
 
                         </form>
 
 
-                        {/* Sign in link */}
+                        {/* Login link */}
                         <div className="login-section">
 
                             Already have an account?
