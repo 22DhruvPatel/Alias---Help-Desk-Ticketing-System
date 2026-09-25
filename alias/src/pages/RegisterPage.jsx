@@ -106,9 +106,16 @@ function RegisterPage() {
          * If email confirmation is enabled in Supabase,
          * a user will be created but there will be no
          * active session yet.
-         */
-
+        */
         if (data.user && !data.session) {
+
+            if (data.user.identities?.length === 0) {
+                setError(
+                    "An account with this email already exists. Please sign in instead."
+                );
+
+                return;
+            }
 
             setSuccess(
                 "Account created successfully. Please check your email to verify your account."
