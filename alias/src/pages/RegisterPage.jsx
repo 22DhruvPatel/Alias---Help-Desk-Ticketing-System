@@ -55,13 +55,19 @@ function RegisterPage() {
         }
 
 
-        // Check length
-        if (formData.password.length < 8) {
+        // Check password strength
+        const password = formData.password;
 
+            if (
+                password.length < 8 ||
+                !/[A-Z]/.test(password) ||
+                !/[a-z]/.test(password) ||
+                !/[0-9]/.test(password) ||
+                !/[!@#$%^&*]/.test(password)
+            ) {
             setError(
-                "Password must contain at least 8 characters."
+                "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
             );
-
             return;
         }
 

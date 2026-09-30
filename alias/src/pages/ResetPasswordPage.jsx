@@ -21,8 +21,16 @@ function ResetPasswordPage() {
             return;
         }
 
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters.");
+        if (
+            password.length < 8 ||
+            !/[A-Z]/.test(password) ||
+            !/[a-z]/.test(password) ||
+            !/[0-9]/.test(password) ||
+            !/[!@#$%^&*]/.test(password)
+        ) {
+            setError(
+                "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+            );
             return;
         }
 
